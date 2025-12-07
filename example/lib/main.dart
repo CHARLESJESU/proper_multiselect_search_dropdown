@@ -1,6 +1,6 @@
 // This is an example file (usually in example/lib/main.dart)
 import 'package:flutter/material.dart';
-import 'package:proper_multiselect_search_dropdown/propermultiselectsearchdropdown/propermultiselect.dart';
+import 'package:proper_multiselect_search_dropdown/proper_multiselect_search-dropdown.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,7 +64,25 @@ class ExamplePage extends StatelessWidget {
                   print('Selected: $selectedItems');
                 },
               ),
-
+              const SizedBox(height: 12),
+              ProperSingleSelectDropdown(
+                items: const [
+                  ['CAR001'],
+                  ['TRUCK002'],
+                  ['BIKE003'],
+                  ['VAN004'],
+                  ['MOTORCYCLE005'],
+                ],
+                hintText: 'Select Vehicles',
+                titleTextStyle: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+                onSelectionChanged: (selectedItems) {
+                  print('Selected: $selectedItems');
+                },
+              ),
               const SizedBox(height: 32),
 
               // Example 2: Title + Subtitle (Dual Value) - Inline

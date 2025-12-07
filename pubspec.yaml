@@ -1,7 +1,7 @@
 name: proper_multiselect_search_dropdown
 description: "multiselect_search_dropdown used for dropdown with multiselect and search functionality."
-version: 1.0.1
-homepage: https://github.com/CHARLESJESU/multiselect_search_dropdown.git
+version: 1.0.2
+homepage: https://github.com/CHARLESJESU/proper_multiselect_search_dropdown.git
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

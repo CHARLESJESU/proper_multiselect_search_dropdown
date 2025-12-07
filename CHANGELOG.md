@@ -3,7 +3,7 @@
 - Added multi-select dropdown widget with search functionality.
 - Provided example app demonstrating how to use the package.
 
-## [1.0.1] - 2025-12-06
+## [1.0.2] 
 
 ### Added
 - Initial release

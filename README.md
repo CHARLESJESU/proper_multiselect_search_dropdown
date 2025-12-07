@@ -15,9 +15,6 @@ A highly customizable multi-select dropdown widget with search functionality for
 - 💪 **Type-safe** and null-safe
 - 🚀 **Easy to use** with sensible defaults
 
-## 📸 Screenshots
-
-[Add screenshots here]
 
 ## 🚀 Installation
 
@@ -25,13 +22,13 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  proper_multiselect_search_dropdown: ^1.0.0
+  proper_multiselect_search_dropdown: ^1.0.1
 ```
 
 Then run:
 
 ```bash
-flutter pub get
+flutter pub get proper_multiselect_search_dropdown
 ```
 
 ## 📖 Usage
@@ -41,7 +38,7 @@ flutter pub get
 ```dart
 import 'package:proper_multiselect_search_dropdown/propermultiselectsearchdropdown/multiselect.dart';
 
-MultiSelectDropdown(
+ProperMultiSelectDropdown(
   items: const [
     ['CAR001'],
     ['TRUCK002'],
@@ -57,7 +54,7 @@ MultiSelectDropdown(
 ### With Title & Subtitle (Inline)
 
 ```dart
-MultiSelectDropdown(
+ProperMultiSelectDropdown(
   items: const [
     ['CAR001', '\$ 25,000'],
     ['TRUCK002', '\$ 45,000'],
@@ -74,7 +71,7 @@ MultiSelectDropdown(
 ### With Title & Subtitle (Two Lines)
 
 ```dart
-MultiSelectDropdown(
+ProperMultiSelectDropdown(
   items: const [
     ['MacBook Pro', '\$ 2,499'],
     ['iPhone 15', '\$ 999'],
@@ -99,7 +96,7 @@ MultiSelectDropdown(
 ### Fully Customized
 
 ```dart
-MultiSelectDropdown(
+ProperMultiSelectDropdown(
   items: const [
     ['Diamond', '\$ 99/mo'],
     ['Gold', '\$ 49/mo'],
@@ -268,8 +265,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🐛 Issues
 
-If you encounter any issues, please file them on [GitHub Issues](https://github.com/YOURUSERNAME/proper_multiselect_search_dropdown/issues).
+If you encounter any issues, please file them on [GitHub Issues](https://github.com/CHARLESJESU/proper_multiselect_search_dropdown/issues).
 
 ## ⭐ Support
 
-If you like this package, please give it a ⭐ on [GitHub](https://github.com/YOURUSERNAME/proper_multiselect_search_dropdown) and 👍 on [pub.dev](https://pub.dev/packages/proper_multiselect_search_dropdown)! 
+If you like this package, please give it a ⭐ on [GitHub](https://github.com/CHARLESJESU/proper_multiselect_search_dropdown.git) and 👍 on [pub.dev](https://pub.dev/packages/proper_multiselect_search_dropdown)! 
