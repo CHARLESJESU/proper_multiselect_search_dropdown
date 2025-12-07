@@ -35,6 +35,7 @@ class ExamplePage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
+
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -66,6 +67,7 @@ class ExamplePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ProperSingleSelectDropdown(
+                enableSearch: false,
                 items: const [
                   ['CAR001'],
                   ['TRUCK002'],
@@ -92,6 +94,7 @@ class ExamplePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ProperMultiSelectDropdown(
+                enableSearch: false,
                 items: const [
                   ['CAR001', '\$ 25,000'],
                   ['TRUCK002', '\$ 45,000'],

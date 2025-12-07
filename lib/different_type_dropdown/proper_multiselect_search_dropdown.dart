@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-/// A customizable multi-select dropdown widget with search functionality
+/// A customizable multi-select dropdown widget with optional search functionality
 class ProperMultiSelectDropdown extends StatefulWidget {
   /// List of items where each item is [title] or [title, subtitle]
   /// Example: [['CAR001']] or [['CAR001', '\$ 25,000']]
@@ -13,20 +12,23 @@ class ProperMultiSelectDropdown extends StatefulWidget {
   /// Hint text shown when no items are selected
   final String hintText;
 
+  /// Enable/disable search functionality (default: true)
+  final bool enableSearch;
+
   /// Maximum height of the dropdown list
   final double maxHeight;
 
   /// Background color of the dropdown button
-  final Color?   backgroundColor;
+  final Color?    backgroundColor;
 
   /// Border color of the dropdown
-  final Color? borderColor;
+  final Color?  borderColor;
 
   /// Custom icon for search (optional)
   final IconData? searchIcon;
 
   /// Custom icon for clear (optional)
-  final IconData?   clearIcon;
+  final IconData?    clearIcon;
 
   /// Custom icon for dropdown arrow down (optional)
   final IconData? arrowDownIcon;
@@ -38,7 +40,7 @@ class ProperMultiSelectDropdown extends StatefulWidget {
   final double iconSize;
 
   /// Color of icons
-  final Color? iconColor;
+  final Color?  iconColor;
 
   /// Custom text to show when items are selected
   /// Use {count} as placeholder for number of selected items
@@ -73,13 +75,13 @@ class ProperMultiSelectDropdown extends StatefulWidget {
   final ListTileControlAffinity checkboxPosition;
 
   /// Checkbox active color
-  final Color? checkboxActiveColor;
+  final Color?  checkboxActiveColor;
 
   /// Checkbox check color
   final Color? checkboxCheckColor;
 
   /// Search box decoration
-  final InputDecoration? searchBoxDecoration;
+  final InputDecoration?  searchBoxDecoration;
 
   /// Search box text style
   final TextStyle? searchBoxTextStyle;
@@ -104,15 +106,16 @@ class ProperMultiSelectDropdown extends StatefulWidget {
 
   const ProperMultiSelectDropdown({
     super.key,
-    required this.items,
-    this. onSelectionChanged,
+    required this. items,
+    this.  onSelectionChanged,
     this.hintText = 'Select Items',
+    this.enableSearch = true,
     this.maxHeight = 250,
     this.backgroundColor,
     this.borderColor,
     this.searchIcon,
-    this.clearIcon,
-    this. arrowDownIcon,
+    this. clearIcon,
+    this.  arrowDownIcon,
     this.arrowUpIcon,
     this.iconSize = 24,
     this.iconColor,
@@ -123,19 +126,19 @@ class ProperMultiSelectDropdown extends StatefulWidget {
     this.subtitleTextStyle,
     this.highlightedTitleTextStyle,
     this.highlightedSubtitleTextStyle,
-    this.titleSubtitleSeparator = ' - ',
+    this. titleSubtitleSeparator = ' - ',
     this.showSubtitleBelow = false,
     this.checkboxPosition = ListTileControlAffinity.leading,
     this.checkboxActiveColor,
     this.checkboxCheckColor,
     this.searchBoxDecoration,
-    this. searchBoxTextStyle,
+    this.  searchBoxTextStyle,
     this.searchBoxBackgroundColor,
     this.searchBoxBorderRadius = 8.0,
     this.searchBoxFocusedBorderColor,
     this.searchBoxEnabledBorderColor,
     this.dropdownBorderRadius = 8.0,
-    this. dropdownElevation = 4.0,
+    this.  dropdownElevation = 4.0,
   });
 
   @override
@@ -154,15 +157,17 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
   void initState() {
     super.initState();
     _filteredItems = List.from(widget.items);
-    _searchController.addListener(() {
-      setState(() {}); // Rebuild to show/hide clear icon
-    });
+    if (widget.enableSearch) {
+      _searchController.addListener(() {
+        setState(() {}); // Rebuild to show/hide clear icon
+      });
+    }
   }
 
   @override
   void didUpdateWidget(ProperMultiSelectDropdown oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.items != widget.items) {
+    if (oldWidget. items != widget.items) {
       _filteredItems = List.from(widget.items);
       // Remove selected indices that are no longer valid
       _selectedIndices.removeWhere((index) => index >= widget.items.length);
@@ -172,34 +177,40 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
   void _toggleDropdown() {
     setState(() {
       _isDropdownOpen = !_isDropdownOpen;
-      if (! _isDropdownOpen) {
-        _searchController.clear();
-        _filteredItems = List.from(widget.items);
-        _searchFocusNode.unfocus();
+      if (!  _isDropdownOpen) {
+        if (widget.enableSearch) {
+          _searchController.clear();
+          _filteredItems = List.from(widget.items);
+          _searchFocusNode.unfocus();
+        }
       } else {
-        // Focus search field when dropdown opens
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _searchFocusNode.requestFocus();
-        });
+        // Focus search field when dropdown opens (only if search is enabled)
+        if (widget.enableSearch) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _searchFocusNode.requestFocus();
+          });
+        }
       }
     });
   }
 
   void _filterItems(String query) {
+    if (! widget.enableSearch) return;
+
     setState(() {
       if (query.isEmpty) {
         _filteredItems = List.from(widget.items);
       } else {
         final lowerQuery = query.toLowerCase();
-        _filteredItems = widget.items. where((item) {
-          if (item.isEmpty) return false;
+        _filteredItems = widget.items.  where((item) {
+          if (item. isEmpty) return false;
 
           // Search in title
           final titleMatch = item[0].toLowerCase().contains(lowerQuery);
 
           // Search in subtitle if exists
-          final subtitleMatch = item. length > 1 &&
-              item[1].toLowerCase().contains(lowerQuery);
+          final subtitleMatch = item.  length > 1 &&
+              item[1].toLowerCase(). contains(lowerQuery);
 
           return titleMatch || subtitleMatch;
         }).toList();
@@ -213,9 +224,9 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
           final aStarts = aTitle.startsWith(lowerQuery);
           final bStarts = bTitle.startsWith(lowerQuery);
 
-          if (aExact && ! bExact) return -1;
-          if (!aExact && bExact) return 1;
-          if (aStarts && !bStarts) return -1;
+          if (aExact && !  bExact) return -1;
+          if (! aExact && bExact) return 1;
+          if (aStarts && ! bStarts) return -1;
           if (!aStarts && bStarts) return 1;
           return a[0].compareTo(b[0]);
         });
@@ -245,7 +256,7 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
   void _notifySelectionChanged() {
     if (widget.onSelectionChanged != null) {
       final selectedItems = _selectedIndices
-          .where((i) => i < widget.items. length)
+          .where((i) => i < widget.items.  length)
           .map((i) => widget.items[i])
           .toList();
       widget.onSelectionChanged!(selectedItems);
@@ -258,14 +269,15 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
     }
 
     if (widget.selectedItemText != null) {
-      return widget.selectedItemText!. replaceAll('{count}', '${_selectedIndices.length}');
+      return widget.selectedItemText!.  replaceAll('{count}', '${_selectedIndices.length}');
     }
 
     return '${_selectedIndices.length} item(s) selected';
   }
 
-  Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle?  highlightStyle) {
-    if (query.isEmpty) {
+  Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle?   highlightStyle) {
+    // Only highlight if search is enabled and query is not empty
+    if (! widget.enableSearch || query.isEmpty) {
       return Text(
         text,
         overflow: TextOverflow.ellipsis,
@@ -311,11 +323,11 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
 
   Widget _buildListItemContent(List<String> item, String query) {
     if (item.isEmpty) {
-      return const SizedBox. shrink();
+      return const SizedBox.  shrink();
     }
 
     final title = item[0];
-    final hasSubtitle = item.length > 1 && item[1].isNotEmpty;
+    final hasSubtitle = item.length > 1 && item[1]. isNotEmpty;
 
     final effectiveTitleStyle = widget.titleTextStyle ??
         const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500);
@@ -323,7 +335,7 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
     final effectiveSubtitleStyle = widget.subtitleTextStyle ??
         TextStyle(fontSize: 13, color: Colors.grey[600]);
 
-    if (! hasSubtitle) {
+    if (!  hasSubtitle) {
       // Only title
       return _buildHighlightedText(
         title,
@@ -352,7 +364,7 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
             subtitle,
             query,
             effectiveSubtitleStyle,
-            widget.highlightedSubtitleTextStyle,
+            widget. highlightedSubtitleTextStyle,
           ),
         ],
       );
@@ -393,7 +405,8 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
       TextStyle baseStyle,
       TextStyle? highlightStyle,
       ) {
-    if (query.isEmpty) {
+    // Only highlight if search is enabled and query is not empty
+    if (!widget.enableSearch || query.isEmpty) {
       return [TextSpan(text: text, style: baseStyle)];
     }
 
@@ -404,7 +417,7 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
 
     final effectiveHighlightStyle = highlightStyle ??
         baseStyle.copyWith(
-          backgroundColor: Colors. yellow[200],
+          backgroundColor: Colors.  yellow[200],
           fontWeight: FontWeight.bold,
         );
 
@@ -428,7 +441,7 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
   }
 
   // Helper method to build icon with fallback
-  Widget _buildIcon(IconData?  customIcon, IconData defaultIcon, {double?  size, Color? color}) {
+  Widget _buildIcon(IconData?   customIcon, IconData defaultIcon, {double?   size, Color?  color}) {
     final effectiveSize = size ?? widget.iconSize;
     final effectiveColor = color ?? widget.iconColor ??  Colors.grey[600];
 
@@ -440,12 +453,12 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
       );
     } catch (e) {
       // Fallback to text-based icon if Material icons fail to load
-      String iconText = '? ';
+      String iconText = '?  ';
       if (defaultIcon == Icons.search) iconText = '🔍';
       if (defaultIcon == Icons.clear) iconText = '✕';
       if (defaultIcon == Icons.arrow_drop_down) iconText = '▼';
       if (defaultIcon == Icons.arrow_drop_up) iconText = '▲';
-      if (defaultIcon == Icons. search_off) iconText = '🔍';
+      if (defaultIcon == Icons.  search_off) iconText = '🔍';
 
       return Text(
         iconText,
@@ -459,11 +472,11 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
 
   // Calculate available height considering keyboard
   double _calculateMaxHeight(BuildContext context) {
-    final RenderBox? renderBox = _dropdownButtonKey. currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox?  renderBox = _dropdownButtonKey.  currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return widget.maxHeight;
 
     final position = renderBox.localToGlobal(Offset.zero);
-    final screenHeight = MediaQuery.of(context). size.height;
+    final screenHeight = MediaQuery.of(context).  size.height;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final dropdownButtonHeight = renderBox.size.height;
 
@@ -484,230 +497,235 @@ class _ProperMultiSelectDropdownState extends State<ProperMultiSelectDropdown> {
         TextStyle(fontSize: 16, color: Colors.grey[600]);
 
     final effectiveSelectedStyle = widget.selectedItemTextStyle ??
-        const TextStyle(fontSize: 16, color: Colors.black87);
+        const TextStyle(fontSize: 16, color: Colors. black87);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Dropdown Button
-        Material(
-          key: _dropdownButtonKey,
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: _toggleDropdown,
+      // Dropdown Button
+      Material(
+      key: _dropdownButtonKey,
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _toggleDropdown,
+        borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          decoration: BoxDecoration(
+            border: Border.all(color: effectiveBorderColor),
             borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                border: Border.all(color: effectiveBorderColor),
-                borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
-                color: effectiveBackgroundColor,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      _getSelectedText(),
-                      style: _selectedIndices.isEmpty
-                          ? effectiveHintStyle
-                          : effectiveSelectedStyle,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_selectedIndices.isNotEmpty)
-                        GestureDetector(
-                          onTap: () {
-                            _clearSelection();
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: _buildIcon(
-                              widget.clearIcon,
-                              Icons.clear,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      _buildIcon(
-                        _isDropdownOpen ? widget.arrowUpIcon : widget. arrowDownIcon,
-                        _isDropdownOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            color: effectiveBackgroundColor,
           ),
-        ),
-
-        // Dropdown Content
-        if (_isDropdownOpen) ...[
-          const SizedBox(height: 8),
-          Material(
-            elevation: widget.dropdownElevation,
-            borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey. shade300),
-                borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
-                color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  _getSelectedText(),
+                  style: _selectedIndices.isEmpty
+                      ? effectiveHintStyle
+                      : effectiveSelectedStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              child: Column(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Search Field
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      onChanged: _filterItems,
-                      style: widget.searchBoxTextStyle,
-                      decoration: widget.searchBoxDecoration ??  InputDecoration(
-                        filled: true,
-                        fillColor: widget.searchBoxBackgroundColor ??  Colors.grey[50],
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius. circular(widget.searchBoxBorderRadius),
-                          borderSide: BorderSide(
-                              color: widget.searchBoxEnabledBorderColor ?? Colors. grey. shade300
-                          ),
+                  if (_selectedIndices.isNotEmpty)
+                    GestureDetector(
+                      onTap: () {
+                        _clearSelection();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: _buildIcon(
+                          widget. clearIcon,
+                          Icons. clear,
+                          size: 20,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(widget.searchBoxBorderRadius),
-                          borderSide: BorderSide(
-                              color: widget.searchBoxEnabledBorderColor ??  Colors.grey.shade300
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(widget.searchBoxBorderRadius),
-                          borderSide: BorderSide(
-                              color: widget.searchBoxFocusedBorderColor ?? Colors.blue,
-                              width: 2
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        hintText: 'Search...',
-                        hintStyle: TextStyle(color: Colors. grey[500]),
-                        prefixIcon: _buildIcon(
-                          widget.searchIcon,
-                          Icons.search,
-                          size: 22,
-                        ),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                          icon: _buildIcon(
-                            widget.clearIcon,
-                            Icons. clear,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                            _filterItems('');
-                          },
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        )
-                            : null,
                       ),
                     ),
+                  _buildIcon(
+                    _isDropdownOpen ? widget.arrowUpIcon : widget.  arrowDownIcon,
+                    _isDropdownOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                   ),
-
-                  // Results count
-                  Padding(
-                    padding: const EdgeInsets. symmetric(horizontal: 12, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${_selectedIndices.length} selected • ${_filteredItems.length} shown',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Divider(height: 1, thickness: 1),
-
-                  // Item List
-                  if (_filteredItems.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        children: [
-                          _buildIcon(
-                            null,
-                            Icons.search_off,
-                            size: 48,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'No items found',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: calculatedMaxHeight,
-                        minHeight: 100,
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: _filteredItems.length,
-                        itemBuilder: (context, index) {
-                          final item = _filteredItems[index];
-                          final originalIndex = widget.items.indexOf(item);
-                          final isSelected = _selectedIndices.contains(originalIndex);
-
-                          return CheckboxListTile(
-                            dense: ! widget.showSubtitleBelow,
-                            controlAffinity: widget.checkboxPosition,
-                            value: isSelected,
-                            title: _buildListItemContent(item, _searchController.text),
-                            selected: isSelected,
-                            activeColor: widget.checkboxActiveColor ??  Colors.blue,
-                            checkColor: widget.checkboxCheckColor ??  Colors.white,
-                            onChanged: (bool? newValue) {
-                              _toggleSelection(originalIndex);
-                            },
-                          );
-                        },
-                      ),
-                    ),
                 ],
               ),
-            ),
+            ],
           ),
-        ],
-      ],
+        ),
+      ),
+    ),
+
+    // Dropdown Content
+    if (_isDropdownOpen) ...[
+    const SizedBox(height: 8),
+    Material(
+    elevation: widget.dropdownElevation,
+    borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
+    child: Container(
+    decoration: BoxDecoration(
+    border: Border.all(color: Colors.grey.  shade300),
+    borderRadius: BorderRadius.circular(widget.dropdownBorderRadius),
+    color: Colors.white,
+    ),
+    child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    // Search Field (only if search is enabled)
+    if (widget.enableSearch)
+    Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: TextField(
+    controller: _searchController,
+    focusNode: _searchFocusNode,
+    onChanged: _filterItems,
+    style: widget.searchBoxTextStyle,
+    decoration: widget.searchBoxDecoration ??  InputDecoration(
+    filled: true,
+    fillColor: widget.searchBoxBackgroundColor ??  Colors.grey[50],
+    isDense: true,
+    border: OutlineInputBorder(
+    borderRadius: BorderRadius.  circular(widget.searchBoxBorderRadius),
+    borderSide: BorderSide(
+    color: widget.searchBoxEnabledBorderColor ??  Colors.  grey.  shade300
+    ),
+    ),
+    enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius. circular(widget.searchBoxBorderRadius),
+    borderSide: BorderSide(
+    color: widget.searchBoxEnabledBorderColor ??  Colors.grey. shade300
+    ),
+    ),
+    focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(widget.searchBoxBorderRadius),
+    borderSide: BorderSide(
+    color: widget.searchBoxFocusedBorderColor ??  Colors.blue,
+    width: 2
+    ),
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 12,
+    ),
+    hintText: 'Search.. .',
+    hintStyle: TextStyle(color: Colors.  grey[500]),
+    prefixIcon: _buildIcon(
+    widget. searchIcon,
+    Icons. search,
+    size: 22,
+    ),
+    suffixIcon: _searchController.text.isNotEmpty
+    ? IconButton(
+    icon: _buildIcon(
+    widget. clearIcon,
+    Icons.  clear,
+    size: 20,
+    ),
+    onPressed: () {
+    _searchController.clear();
+    _filterItems('');
+    },
+    padding: EdgeInsets.zero,
+    constraints: const BoxConstraints(),
+    )
+        : null,
+    ),
+    ),
+    ),
+
+    // Results count (only if search is enabled)
+    if (widget.enableSearch)
+    Padding(
+    padding: const EdgeInsets.  symmetric(horizontal: 12, vertical: 4),
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+    Text(
+    '${_selectedIndices.length} selected • ${_filteredItems.length} shown',
+    style: TextStyle(
+    fontSize: 12,
+    color: Colors. grey[600],
+    fontStyle: FontStyle.italic,
+    ),
+    ),
+    ],
+    ),
+    ),
+
+    if (widget.enableSearch) const Divider(height: 1, thickness: 1),
+
+    // Item List
+    if (_filteredItems.isEmpty)
+    Padding(
+    padding: const EdgeInsets.all(32.0),
+    child: Column(
+    children: [
+    _buildIcon(
+    null,
+    Icons.search_off,
+    size: 48,
+    color: Colors.grey[400],
+    ),
+    const SizedBox(height: 8),
+    Text(
+    widget.enableSearch ?  'No items found' : 'No items available',
+    style: TextStyle(
+    color: Colors. grey[600],
+    fontSize: 14,
+    ),
+    ),
+    ],
+    ),
+    )
+    else
+    ConstrainedBox(
+    constraints: BoxConstraints(
+    maxHeight: calculatedMaxHeight,
+    minHeight: 100,
+    ),
+    child: ListView.builder(
+    shrinkWrap: true,
+    padding: EdgeInsets.zero,
+    physics: const AlwaysScrollableScrollPhysics(),
+    itemCount: _filteredItems.length,
+    itemBuilder: (context, index) {
+    final item = _filteredItems[index];
+    final originalIndex = widget.items.indexOf(item);
+    final isSelected = _selectedIndices.contains(originalIndex);
+
+    return CheckboxListTile(
+    dense: !  widget.showSubtitleBelow,
+    controlAffinity: widget.checkboxPosition,
+    value: isSelected,
+    title: _buildListItemContent(
+    item,
+    widget.enableSearch ? _searchController.text : ''
+    ),
+    selected: isSelected,
+    activeColor: widget.checkboxActiveColor ??  Colors.blue,
+    checkColor: widget.checkboxCheckColor ??  Colors.white,
+    onChanged: (bool? newValue) {
+    _toggleSelection(originalIndex);
+    },
     );
-  }
+    },
+    ),
+    ),
+    ],
+    ),
+    ),
+    ),
+    ],
+    ],
+    );
+    }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchController. dispose();
     _searchFocusNode.dispose();
     super.dispose();
   }

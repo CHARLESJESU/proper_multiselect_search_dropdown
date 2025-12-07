@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A customizable single-select dropdown widget with search functionality
+/// A customizable single-select dropdown widget with optional search functionality
 class ProperSingleSelectDropdown extends StatefulWidget {
   /// List of items where each item is [title] or [title, subtitle]
   /// Example: [['CAR001']] or [['CAR001', '\$ 25,000']]
@@ -13,6 +13,9 @@ class ProperSingleSelectDropdown extends StatefulWidget {
   /// Hint text shown when no item is selected
   final String hintText;
 
+  /// Enable/disable search functionality (default: true)
+  final bool enableSearch;
+
   /// Maximum height of the dropdown list
   final double maxHeight;
 
@@ -23,7 +26,7 @@ class ProperSingleSelectDropdown extends StatefulWidget {
   final Color? borderColor;
 
   /// Custom icon for search (optional)
-  final IconData?  searchIcon;
+  final IconData? searchIcon;
 
   /// Custom icon for clear (optional)
   final IconData?  clearIcon;
@@ -99,6 +102,7 @@ class ProperSingleSelectDropdown extends StatefulWidget {
     required this.items,
     this.onSelectionChanged,
     this.hintText = 'Select Item',
+    this.enableSearch = true,
     this.maxHeight = 250,
     this.backgroundColor,
     this.borderColor,
@@ -114,17 +118,17 @@ class ProperSingleSelectDropdown extends StatefulWidget {
     this.subtitleTextStyle,
     this.highlightedTitleTextStyle,
     this.highlightedSubtitleTextStyle,
-    this. titleSubtitleSeparator = ' - ',
+    this.titleSubtitleSeparator = ' - ',
     this.showSubtitleBelow = false,
     this.searchBoxDecoration,
     this.searchBoxTextStyle,
     this.searchBoxBackgroundColor,
-    this. searchBoxBorderRadius = 8.0,
+    this.searchBoxBorderRadius = 8.0,
     this.searchBoxFocusedBorderColor,
     this.searchBoxEnabledBorderColor,
     this.dropdownBorderRadius = 8.0,
-    this.dropdownElevation = 4.0,
-    this. autoCloseOnSelect = true,
+    this. dropdownElevation = 4.0,
+    this.autoCloseOnSelect = true,
     this.showClearButton = true,
   });
 
@@ -134,7 +138,7 @@ class ProperSingleSelectDropdown extends StatefulWidget {
 
 class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown> {
   final TextEditingController _searchController = TextEditingController();
-  int?  _selectedIndex; // Changed from Set to single int?
+  int? _selectedIndex;
   List<List<String>> _filteredItems = [];
   bool _isDropdownOpen = false;
   final FocusNode _searchFocusNode = FocusNode();
@@ -144,15 +148,17 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
   void initState() {
     super.initState();
     _filteredItems = List.from(widget.items);
-    _searchController.addListener(() {
-      setState(() {}); // Rebuild to show/hide clear icon
-    });
+    if (widget.enableSearch) {
+      _searchController.addListener(() {
+        setState(() {}); // Rebuild to show/hide clear icon
+      });
+    }
   }
 
   @override
   void didUpdateWidget(ProperSingleSelectDropdown oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.items != widget.items) {
+    if (oldWidget. items != widget.items) {
       _filteredItems = List.from(widget.items);
       // Clear selection if index is no longer valid
       if (_selectedIndex != null && _selectedIndex!  >= widget.items.length) {
@@ -165,32 +171,38 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     setState(() {
       _isDropdownOpen = !_isDropdownOpen;
       if (! _isDropdownOpen) {
-        _searchController.clear();
-        _filteredItems = List.from(widget.items);
-        _searchFocusNode.unfocus();
+        if (widget.enableSearch) {
+          _searchController.clear();
+          _filteredItems = List.from(widget.items);
+          _searchFocusNode.unfocus();
+        }
       } else {
-        // Focus search field when dropdown opens
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _searchFocusNode.requestFocus();
-        });
+        // Focus search field when dropdown opens (only if search is enabled)
+        if (widget.enableSearch) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _searchFocusNode.requestFocus();
+          });
+        }
       }
     });
   }
 
   void _filterItems(String query) {
+    if (! widget.enableSearch) return;
+
     setState(() {
       if (query.isEmpty) {
         _filteredItems = List.from(widget.items);
       } else {
         final lowerQuery = query.toLowerCase();
-        _filteredItems = widget.items.where((item) {
+        _filteredItems = widget. items.where((item) {
           if (item. isEmpty) return false;
 
           // Search in title
           final titleMatch = item[0].toLowerCase().contains(lowerQuery);
 
           // Search in subtitle if exists
-          final subtitleMatch = item.length > 1 &&
+          final subtitleMatch = item. length > 1 &&
               item[1].toLowerCase(). contains(lowerQuery);
 
           return titleMatch || subtitleMatch;
@@ -207,7 +219,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
 
           if (aExact && ! bExact) return -1;
           if (!aExact && bExact) return 1;
-          if (aStarts && ! bStarts) return -1;
+          if (aStarts && !bStarts) return -1;
           if (!aStarts && bStarts) return 1;
           return a[0].compareTo(b[0]);
         });
@@ -223,9 +235,11 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
       // Auto-close dropdown after selection
       if (widget.autoCloseOnSelect) {
         _isDropdownOpen = false;
-        _searchController.clear();
-        _filteredItems = List.from(widget.items);
-        _searchFocusNode.unfocus();
+        if (widget.enableSearch) {
+          _searchController.clear();
+          _filteredItems = List. from(widget.items);
+          _searchFocusNode.unfocus();
+        }
       }
     });
   }
@@ -238,9 +252,9 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
   }
 
   void _notifySelectionChanged() {
-    if (widget. onSelectionChanged != null) {
+    if (widget.onSelectionChanged != null) {
       final selectedItem = _selectedIndex != null && _selectedIndex! < widget.items.length
-          ?  widget.items[_selectedIndex! ]
+          ? widget.items[_selectedIndex!]
           : null;
       widget.onSelectionChanged!(selectedItem);
     }
@@ -262,7 +276,8 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
   }
 
   Widget _buildHighlightedText(String text, String query, TextStyle baseStyle, TextStyle? highlightStyle) {
-    if (query.isEmpty) {
+    // Only highlight if search is enabled and query is not empty
+    if (!widget.enableSearch || query.isEmpty) {
       return Text(
         text,
         overflow: TextOverflow.ellipsis,
@@ -312,12 +327,12 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     }
 
     final title = item[0];
-    final hasSubtitle = item.length > 1 && item[1]. isNotEmpty;
+    final hasSubtitle = item.length > 1 && item[1].isNotEmpty;
 
     final effectiveTitleStyle = widget.titleTextStyle ??
         const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500);
 
-    final effectiveSubtitleStyle = widget.subtitleTextStyle ??
+    final effectiveSubtitleStyle = widget. subtitleTextStyle ??
         TextStyle(fontSize: 13, color: Colors.grey[600]);
 
     if (! hasSubtitle) {
@@ -376,7 +391,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
       subtitle,
       query,
       effectiveSubtitleStyle,
-      widget.highlightedSubtitleTextStyle,
+      widget. highlightedSubtitleTextStyle,
       ),
     ],
     ),
@@ -390,7 +405,8 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
       TextStyle baseStyle,
       TextStyle? highlightStyle,
       ) {
-    if (query.isEmpty) {
+    // Only highlight if search is enabled and query is not empty
+    if (!widget.enableSearch || query.isEmpty) {
       return [TextSpan(text: text, style: baseStyle)];
     }
 
@@ -431,7 +447,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
 
     try {
       return Icon(
-        customIcon ??  defaultIcon,
+        customIcon ?? defaultIcon,
         size: effectiveSize,
         color: effectiveColor,
       );
@@ -459,7 +475,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     final RenderBox?  renderBox = _dropdownButtonKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return widget.maxHeight;
 
-    final position = renderBox.localToGlobal(Offset. zero);
+    final position = renderBox.localToGlobal(Offset.zero);
     final screenHeight = MediaQuery.of(context).size. height;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final dropdownButtonHeight = renderBox.size.height;
@@ -481,7 +497,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
         TextStyle(fontSize: 16, color: Colors.grey[600]);
 
     final effectiveSelectedStyle = widget.selectedItemTextStyle ??
-        const TextStyle(fontSize: 16, color: Colors.black87);
+        const TextStyle(fontSize: 16, color: Colors. black87);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,7 +574,8 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-    // Search Field
+    // Search Field (only if search is enabled)
+    if (widget.enableSearch)
     Padding(
     padding: const EdgeInsets.all(12.0),
     child: TextField(
@@ -579,10 +596,10 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     enabledBorder: OutlineInputBorder(
     borderRadius: BorderRadius.circular(widget.searchBoxBorderRadius),
     borderSide: BorderSide(
-    color: widget. searchBoxEnabledBorderColor ?? Colors.grey.shade300),
+    color: widget.searchBoxEnabledBorderColor ?? Colors. grey.shade300),
     ),
     focusedBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(widget. searchBoxBorderRadius),
+    borderRadius: BorderRadius.circular(widget.searchBoxBorderRadius),
     borderSide: BorderSide(
     color: widget.searchBoxFocusedBorderColor ?? Colors.blue, width: 2),
     ),
@@ -616,7 +633,8 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     ),
     ),
 
-    // Results count
+    // Results count (only if search is enabled)
+    if (widget.enableSearch)
     Padding(
     padding: const EdgeInsets. symmetric(horizontal: 12, vertical: 4),
     child: Row(
@@ -634,7 +652,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     ),
     ),
 
-    const Divider(height: 1, thickness: 1),
+    if (widget.enableSearch) const Divider(height: 1, thickness: 1),
 
     // Item List
     if (_filteredItems.isEmpty)
@@ -650,7 +668,7 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
     ),
     const SizedBox(height: 8),
     Text(
-    'No items found',
+    widget.enableSearch ?  'No items found' : 'No items available',
     style: TextStyle(
     color: Colors.grey[600],
     fontSize: 14,
@@ -677,9 +695,12 @@ class _ProperSingleSelectDropdownState extends State<ProperSingleSelectDropdown>
 
     return ListTile(
     dense: ! widget.showSubtitleBelow,
-    title: _buildListItemContent(item, _searchController.text),
+    title: _buildListItemContent(
+    item,
+    widget.enableSearch ? _searchController.text : ''
+    ),
     selected: isSelected,
-    selectedTileColor: Colors.blue. withOpacity(0.1),
+    selectedTileColor: Colors.blue.withOpacity(0.1),
     trailing: isSelected
     ? Icon(Icons.check, color: Colors.blue, size: 24)
         : null,
